@@ -1,0 +1,24 @@
+# Base
+pytz
+python-slugify
+Pillow
+psycopg2
+
+# Django
+django
+
+# Environment
+django-environ
+
+# Passwords security
+argon2-cffi
+
+# Static files
+whitenoise
+
+# Celery
+redis
+django-redis
+celery
+tornado
+flower
