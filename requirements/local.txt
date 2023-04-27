@@ -1,7 +1,8 @@
 -r ./base.txt
 
 # Debugging
-ipdb==0.11
+ipdb
+httpie
 
 # Tools
 django-extensions
