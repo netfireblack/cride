@@ -15,6 +15,7 @@ from cride.users.permissions import IsAccountOwner
 
 # Serializers
 from cride.circles.serializers import CircleModelSerializer
+from cride.users.serializers.profiles import ProfileModelSerializer
 from cride.users.serializers import UserLoginSerializer, UserModelSerializer, UsersSignUpSerializer, AccountVerificationSerializer
 
 # Models
@@ -22,7 +23,7 @@ from cride.users.models import User
 from cride.circles.models import Circle
 
 
-class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
     """User view set
     
     Handle sign up, login and account verification.
@@ -36,7 +37,7 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         """Assign permissions based on action."""
         if self.action in ['signup', 'login', 'verify']:
             permissions = [AllowAny]
-        elif self.action == 'retrieve':
+        elif self.action in ['retrieve', 'update', 'partial_update']:
             permissions = [IsAuthenticated, IsAccountOwner]
         else:
             permissions = [IsAuthenticated]
@@ -72,6 +73,22 @@ class UserViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         data = {'message': 'Congratulation, now go share some rides!'}
         return Response(data, status=status.HTTP_200_OK)
     
+    @action(detail=True, methods=['put', 'patch'])
+    def profile(self, request, *args, **kwargs):
+        """Update profile data."""
+        user = self.get_object()
+        profile = user.profile
+        partial = request.method == 'PATCH'
+        serializer = ProfileModelSerializer(
+            profile,
+            data=request.data,
+            partial=partial
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        data = UserModelSerializer(user).data
+        return Response(data)
+
     def retrieve(self, request, *args, **kwargs):
         """Add extra data to the response."""
         response = super(UserViewSet, self).retrieve(request, *args, **kwargs)
