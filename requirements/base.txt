@@ -12,6 +12,7 @@ django-environ
 
 # Django REST Framework
 djangorestframework
+django-filter
 
 # JWT
 pyjwt
